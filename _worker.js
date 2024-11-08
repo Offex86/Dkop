@@ -31,15 +31,15 @@ export default {
 			userID = env.UUID || userID;
 			proxyIP = env.PROXYIP || proxyIP;
 			dohURL = env.DNS_RESOLVER_URL || dohURL;
-			let userID_Dkop = userID;
+			let userID_Path = userID;
 			if (userID.includes(',')) {
-				userID_Dkop = userID.split(',')[0];
+				userID_Path = userID.split(',')[0];
 			}
 			const upgradeHeader = request.headers.get('Upgrade');
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
 				const url = new URL(request.url);
-				switch (url.Dkopname) {
-					case `/cf`: {
+				switch (url.pathname) {
+					case `/Dkop`: {
 						return new Response(JSON.stringify(request.cf, null, 4), {
 							status: 200,
 							headers: {
@@ -56,7 +56,7 @@ export default {
 							}
 						});
 					};
-					case `/sub/${userID_Dkop}`: {
+					case `/sub/${userID_Path}`: {
 						const url = new URL(request.url);
 						const searchParams = url.searchParams;
 						const vlessSubConfig = createVLESSSub(userID, request.headers.get('Host'));
@@ -68,9 +68,9 @@ export default {
 							}
 						});
 					};
-					case `/bestip/${userID_Dkop}`: {
+					case `/bestip/${userID_Path}`: {
 						const headers = request.headers;
-						const url = `https://sub.xf.free.hr/auto?host=${request.headers.get('Host')}&uuid=${userID}&Dkop=/`;
+						const url = `https://sub.xf.free.hr/auto?host=${request.headers.get('Host')}&uuid=${userID}&path=/`;
 						const bestSubConfig = await fetch(url, { headers: headers });
 						return bestSubConfig;
 					};
@@ -828,10 +828,10 @@ ${vlessSec}
 const portSet_http = new Set([80]);
 const portSet_https = new Set([]);
 
-function createVLESSSub(userID_Dkop, hostName) {
+function createVLESSSub(userID_Path, hostName) {
 	const userIDArray = userID_Path.includes(',') ? userID_Path.split(',') : [userID_Path];
-	const commonUrlPart_http = `?encryption=none&security=none&fp=random&type=ws&host=${hostName}&Dkop=%2F%3Fed%3D2048#`;
-	const commonUrlPart_https = `?encryption=none&security=tls&sni=${hostName}&fp=random&type=ws&host=${hostName}&Dkop=%2F%3Fed%3D2048#`;
+	const commonUrlPart_http = `?encryption=none&security=none&fp=random&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#`;
+	const commonUrlPart_https = `?encryption=none&security=tls&sni=${hostName}&fp=random&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#`;
 
 	const output = userIDArray.flatMap((userID) => {
 		const httpConfigurations = Array.from(portSet_http).flatMap((port) => {
